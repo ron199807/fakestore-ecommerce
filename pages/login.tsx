@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/router';
-import { FaLock, FaUser, FaGoogle, FaGithub, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaLock, FaUser, FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const LoginPage: NextPage = () => {
   const [formData, setFormData] = useState({
