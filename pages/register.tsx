@@ -1,89 +1,98 @@
-import { NextPage } from 'next';
-import Head from 'next/head';
-import { useState } from 'react';
-import Link from 'next/link';
-import { useAuth } from '@/contexts/AuthContext';
-import { useRouter } from 'next/router';
-import { FaUser, FaEnvelope, FaLock, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
+import { NextPage } from "next";
+import Head from "next/head";
+import { useState } from "react";
+import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/router";
+import {
+  FaUser,
+  FaEnvelope,
+  FaLock,
+  FaPhone,
+  FaMapMarkerAlt,
+} from "react-icons/fa";
 
 const RegisterPage: NextPage = () => {
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    firstname: '',
-    lastname: '',
-    phone: '',
-    city: '',
-    street: '',
-    zipcode: '',
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    firstname: "",
+    lastname: "",
+    phone: "",
+    city: "",
+    street: "",
+    zipcode: "",
   });
-  
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const { register } = useAuth();
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-    
+
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: '',
+        [name]: "",
       }));
     }
   };
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!formData.username.trim()) {
-      newErrors.username = 'Username is required';
+      newErrors.username = "Username is required";
     }
-    
+
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email';
+      newErrors.email = "Please enter a valid email";
     }
-    
+
     if (!formData.password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = "Password is required";
     } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+      newErrors.password = "Password must be at least 6 characters";
     }
-    
+
     if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
+      newErrors.confirmPassword = "Passwords do not match";
     }
-    
+
     if (!formData.firstname.trim()) {
-      newErrors.firstname = 'First name is required';
+      newErrors.firstname = "First name is required";
     }
-    
+
     if (!formData.lastname.trim()) {
-      newErrors.lastname = 'Last name is required';
+      newErrors.lastname = "Last name is required";
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  // pages/register.tsx - Just update the handleSubmit function
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     setIsLoading(true);
+    setErrors({});
+
     try {
       const userData = {
         email: formData.email,
@@ -94,22 +103,25 @@ const RegisterPage: NextPage = () => {
           lastname: formData.lastname,
         },
         address: {
-          city: formData.city || 'New York',
-          street: formData.street || '123 Main St',
+          city: formData.city || "New York",
+          street: formData.street || "123 Main St",
           number: 1,
-          zipcode: formData.zipcode || '10001',
+          zipcode: formData.zipcode || "10001",
           geolocation: {
-            lat: '0',
-            long: '0',
+            lat: "0",
+            long: "0",
           },
         },
-        phone: formData.phone || '1-234-567-8900',
+        phone: formData.phone || "1-234-567-8900",
       };
-      
+
       await register(userData);
     } catch (error) {
       setErrors({
-        submit: 'Registration failed. Please try again.',
+        submit:
+          error instanceof Error
+            ? error.message
+            : "Registration failed. Please try again.",
       });
     } finally {
       setIsLoading(false);
@@ -121,14 +133,18 @@ const RegisterPage: NextPage = () => {
       <Head>
         <title>FakeStore - Register</title>
       </Head>
-      
+
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl w-full">
           <div className="text-center mb-8">
             <Link href="/" className="inline-block">
-              <h1 className="text-4xl font-bold text-blue-600 mb-2">FakeStore</h1>
+              <h1 className="text-4xl font-bold text-blue-600 mb-2">
+                FakeStore
+              </h1>
             </Link>
-            <h2 className="text-3xl font-bold text-gray-900">Create your account</h2>
+            <h2 className="text-3xl font-bold text-gray-900">
+              Create your account
+            </h2>
             <p className="mt-2 text-gray-600">
               Join thousands of happy customers shopping with us
             </p>
@@ -146,7 +162,9 @@ const RegisterPage: NextPage = () => {
                     </div>
                     <div>
                       <h4 className="font-semibold">Free Shipping</h4>
-                      <p className="text-blue-100 text-sm">On orders over $50</p>
+                      <p className="text-blue-100 text-sm">
+                        On orders over $50
+                      </p>
                     </div>
                   </li>
                   <li className="flex items-start">
@@ -155,7 +173,9 @@ const RegisterPage: NextPage = () => {
                     </div>
                     <div>
                       <h4 className="font-semibold">Exclusive Deals</h4>
-                      <p className="text-blue-100 text-sm">Members-only discounts</p>
+                      <p className="text-blue-100 text-sm">
+                        Members-only discounts
+                      </p>
                     </div>
                   </li>
                   <li className="flex items-start">
@@ -164,7 +184,9 @@ const RegisterPage: NextPage = () => {
                     </div>
                     <div>
                       <h4 className="font-semibold">Reward Points</h4>
-                      <p className="text-blue-100 text-sm">Earn points on every purchase</p>
+                      <p className="text-blue-100 text-sm">
+                        Earn points on every purchase
+                      </p>
                     </div>
                   </li>
                   <li className="flex items-start">
@@ -173,7 +195,9 @@ const RegisterPage: NextPage = () => {
                     </div>
                     <div>
                       <h4 className="font-semibold">Secure Checkout</h4>
-                      <p className="text-blue-100 text-sm">100% protected transactions</p>
+                      <p className="text-blue-100 text-sm">
+                        100% protected transactions
+                      </p>
                     </div>
                   </li>
                 </ul>
@@ -191,7 +215,10 @@ const RegisterPage: NextPage = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Username */}
                     <div>
-                      <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label
+                        htmlFor="username"
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                      >
                         Username *
                       </label>
                       <div className="relative">
@@ -205,19 +232,26 @@ const RegisterPage: NextPage = () => {
                           value={formData.username}
                           onChange={handleChange}
                           className={`block w-full pl-10 pr-3 py-3 border ${
-                            errors.username ? 'border-red-500' : 'border-gray-300'
+                            errors.username
+                              ? "border-red-500"
+                              : "border-gray-300"
                           } rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
                           placeholder="Choose a username"
                         />
                       </div>
                       {errors.username && (
-                        <p className="mt-2 text-sm text-red-600">{errors.username}</p>
+                        <p className="mt-2 text-sm text-red-600">
+                          {errors.username}
+                        </p>
                       )}
                     </div>
 
                     {/* Email */}
                     <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label
+                        htmlFor="email"
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                      >
                         Email Address *
                       </label>
                       <div className="relative">
@@ -231,19 +265,24 @@ const RegisterPage: NextPage = () => {
                           value={formData.email}
                           onChange={handleChange}
                           className={`block w-full pl-10 pr-3 py-3 border ${
-                            errors.email ? 'border-red-500' : 'border-gray-300'
+                            errors.email ? "border-red-500" : "border-gray-300"
                           } rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
                           placeholder="your@email.com"
                         />
                       </div>
                       {errors.email && (
-                        <p className="mt-2 text-sm text-red-600">{errors.email}</p>
+                        <p className="mt-2 text-sm text-red-600">
+                          {errors.email}
+                        </p>
                       )}
                     </div>
 
                     {/* First Name */}
                     <div>
-                      <label htmlFor="firstname" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label
+                        htmlFor="firstname"
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                      >
                         First Name *
                       </label>
                       <input
@@ -253,18 +292,25 @@ const RegisterPage: NextPage = () => {
                         value={formData.firstname}
                         onChange={handleChange}
                         className={`block w-full px-3 py-3 border ${
-                          errors.firstname ? 'border-red-500' : 'border-gray-300'
+                          errors.firstname
+                            ? "border-red-500"
+                            : "border-gray-300"
                         } rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
                         placeholder="John"
                       />
                       {errors.firstname && (
-                        <p className="mt-2 text-sm text-red-600">{errors.firstname}</p>
+                        <p className="mt-2 text-sm text-red-600">
+                          {errors.firstname}
+                        </p>
                       )}
                     </div>
 
                     {/* Last Name */}
                     <div>
-                      <label htmlFor="lastname" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label
+                        htmlFor="lastname"
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                      >
                         Last Name *
                       </label>
                       <input
@@ -274,18 +320,23 @@ const RegisterPage: NextPage = () => {
                         value={formData.lastname}
                         onChange={handleChange}
                         className={`block w-full px-3 py-3 border ${
-                          errors.lastname ? 'border-red-500' : 'border-gray-300'
+                          errors.lastname ? "border-red-500" : "border-gray-300"
                         } rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
                         placeholder="Doe"
                       />
                       {errors.lastname && (
-                        <p className="mt-2 text-sm text-red-600">{errors.lastname}</p>
+                        <p className="mt-2 text-sm text-red-600">
+                          {errors.lastname}
+                        </p>
                       )}
                     </div>
 
                     {/* Password */}
                     <div>
-                      <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label
+                        htmlFor="password"
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                      >
                         Password *
                       </label>
                       <div className="relative">
@@ -299,19 +350,26 @@ const RegisterPage: NextPage = () => {
                           value={formData.password}
                           onChange={handleChange}
                           className={`block w-full pl-10 pr-3 py-3 border ${
-                            errors.password ? 'border-red-500' : 'border-gray-300'
+                            errors.password
+                              ? "border-red-500"
+                              : "border-gray-300"
                           } rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
                           placeholder="At least 6 characters"
                         />
                       </div>
                       {errors.password && (
-                        <p className="mt-2 text-sm text-red-600">{errors.password}</p>
+                        <p className="mt-2 text-sm text-red-600">
+                          {errors.password}
+                        </p>
                       )}
                     </div>
 
                     {/* Confirm Password */}
                     <div>
-                      <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label
+                        htmlFor="confirmPassword"
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                      >
                         Confirm Password *
                       </label>
                       <div className="relative">
@@ -325,19 +383,26 @@ const RegisterPage: NextPage = () => {
                           value={formData.confirmPassword}
                           onChange={handleChange}
                           className={`block w-full pl-10 pr-3 py-3 border ${
-                            errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+                            errors.confirmPassword
+                              ? "border-red-500"
+                              : "border-gray-300"
                           } rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
                           placeholder="Confirm your password"
                         />
                       </div>
                       {errors.confirmPassword && (
-                        <p className="mt-2 text-sm text-red-600">{errors.confirmPassword}</p>
+                        <p className="mt-2 text-sm text-red-600">
+                          {errors.confirmPassword}
+                        </p>
                       )}
                     </div>
 
                     {/* Phone */}
                     <div>
-                      <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label
+                        htmlFor="phone"
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                      >
                         Phone Number
                       </label>
                       <div className="relative">
@@ -358,7 +423,10 @@ const RegisterPage: NextPage = () => {
 
                     {/* City */}
                     <div>
-                      <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label
+                        htmlFor="city"
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                      >
                         City
                       </label>
                       <div className="relative">
@@ -387,13 +455,22 @@ const RegisterPage: NextPage = () => {
                       required
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
                     />
-                    <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
-                      I agree to the{' '}
-                      <Link href="/terms" className="text-blue-600 hover:text-blue-500">
+                    <label
+                      htmlFor="terms"
+                      className="ml-2 block text-sm text-gray-700"
+                    >
+                      I agree to the{" "}
+                      <Link
+                        href="/terms"
+                        className="text-blue-600 hover:text-blue-500"
+                      >
                         Terms of Service
-                      </Link>{' '}
-                      and{' '}
-                      <Link href="/privacy" className="text-blue-600 hover:text-blue-500">
+                      </Link>{" "}
+                      and{" "}
+                      <Link
+                        href="/privacy"
+                        className="text-blue-600 hover:text-blue-500"
+                      >
                         Privacy Policy
                       </Link>
                     </label>
@@ -412,7 +489,7 @@ const RegisterPage: NextPage = () => {
                           Creating account...
                         </div>
                       ) : (
-                        'Create Account'
+                        "Create Account"
                       )}
                     </button>
                   </div>
@@ -420,8 +497,11 @@ const RegisterPage: NextPage = () => {
 
                 <div className="mt-6 text-center">
                   <p className="text-sm text-gray-600">
-                    Already have an account?{' '}
-                    <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
+                    Already have an account?{" "}
+                    <Link
+                      href="/login"
+                      className="font-medium text-blue-600 hover:text-blue-500"
+                    >
                       Sign in here
                     </Link>
                   </p>

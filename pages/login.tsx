@@ -4,13 +4,14 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/router';
-import { FaLock, FaUser, FaEnvelope, FaGoogle, FaGithub } from 'react-icons/fa';
+import { FaLock, FaUser, FaGoogle, FaGithub, FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const LoginPage: NextPage = () => {
   const [formData, setFormData] = useState({
     username: '',
     password: '',
   });
+  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   
@@ -57,9 +58,10 @@ const LoginPage: NextPage = () => {
     }
     
     setIsLoading(true);
+    setErrors({});
+    
     try {
       await login(formData);
-      // Router push will happen in the login function
     } catch (error) {
       setErrors({
         submit: 'Invalid username or password. Please try again.',
@@ -69,9 +71,23 @@ const LoginPage: NextPage = () => {
     }
   };
 
-  const handleSocialLogin = (provider: string) => {
-    alert(`Social login with ${provider} would be implemented here.`);
+  const handleDemoLogin = async (demoUser: { username: string; password: string }) => {
+    setFormData(demoUser);
+    
+    try {
+      await login(demoUser);
+    } catch (error) {
+      setErrors({
+        submit: 'Demo login failed. Please try again.',
+      });
+    }
   };
+
+  const demoUsers = [
+    { username: 'johnd', password: 'm38rmF$', name: 'John Doe' },
+    { username: 'mor_2314', password: '83r5^_', name: 'David Morrison' },
+    { username: 'kevinryan', password: 'kev02937@', name: 'Kevin Ryan' },
+  ];
 
   return (
     <>
@@ -92,22 +108,26 @@ const LoginPage: NextPage = () => {
             </p>
           </div>
 
-          {/* Social Login Buttons */}
-          <div className="grid grid-cols-2 gap-4">
-            <button
-              onClick={() => handleSocialLogin('google')}
-              className="flex items-center justify-center bg-white border border-gray-300 rounded-xl py-3 px-4 hover:bg-gray-50 transition-colors"
-            >
-              <FaGoogle className="text-red-500 mr-3" />
-              <span className="font-medium">Google</span>
-            </button>
-            <button
-              onClick={() => handleSocialLogin('github')}
-              className="flex items-center justify-center bg-gray-900 text-white rounded-xl py-3 px-4 hover:bg-gray-800 transition-colors"
-            >
-              <FaGithub className="mr-3" />
-              <span className="font-medium">GitHub</span>
-            </button>
+          {/* Demo Users Quick Login */}
+          <div className="bg-blue-50 rounded-xl p-6">
+            <h3 className="text-lg font-semibold text-blue-900 mb-3">Quick Login (Demo Users)</h3>
+            <div className="space-y-2">
+              {demoUsers.map((demoUser) => (
+                <button
+                  key={demoUser.username}
+                  onClick={() => handleDemoLogin(demoUser)}
+                  className="w-full flex justify-between items-center bg-white border border-blue-200 rounded-lg p-3 hover:bg-blue-50 transition-colors"
+                >
+                  <div className="text-left">
+                    <div className="font-medium text-blue-700">{demoUser.name}</div>
+                    <div className="text-sm text-blue-600">@{demoUser.username}</div>
+                  </div>
+                  <div className="text-xs text-gray-500 bg-blue-100 px-2 py-1 rounded">
+                    Click to login
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Divider */}
@@ -116,7 +136,7 @@ const LoginPage: NextPage = () => {
               <div className="w-full border-t border-gray-300"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-transparent text-gray-500">Or continue with</span>
+              <span className="px-2 bg-transparent text-gray-500">Or sign in manually</span>
             </div>
           </div>
 
@@ -173,15 +193,26 @@ const LoginPage: NextPage = () => {
                   <input
                     id="password"
                     name="password"
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     autoComplete="current-password"
                     value={formData.password}
                     onChange={handleChange}
-                    className={`block w-full pl-10 pr-3 py-3 border ${
+                    className={`block w-full pl-10 pr-10 py-3 border ${
                       errors.password ? 'border-red-500' : 'border-gray-300'
                     } rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
                     placeholder="Enter your password"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  >
+                    {showPassword ? (
+                      <FaEyeSlash className="h-5 w-5 text-gray-400" />
+                    ) : (
+                      <FaEye className="h-5 w-5 text-gray-400" />
+                    )}
+                  </button>
                 </div>
                 {errors.password && (
                   <p className="mt-2 text-sm text-red-600">{errors.password}</p>
@@ -243,24 +274,6 @@ const LoginPage: NextPage = () => {
                 >
                   Create an account
                 </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* Demo Credentials */}
-          <div className="bg-blue-50 rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-blue-900 mb-2">Demo Credentials</h3>
-            <p className="text-blue-700 text-sm mb-3">
-              Use these credentials to test the login:
-            </p>
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-blue-600">Username:</span>
-                <code className="bg-blue-100 text-blue-800 px-2 py-1 rounded">johnd</code>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-blue-600">Password:</span>
-                <code className="bg-blue-100 text-blue-800 px-2 py-1 rounded">m38rmF$</code>
               </div>
             </div>
           </div>
